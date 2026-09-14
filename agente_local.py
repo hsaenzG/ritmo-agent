@@ -3,11 +3,12 @@ agente_local.py — Ritmo corriendo SOLO en tu laptop.
 
 Esta es la primera versión que se muestra en el video. No tiene una sola línea
 de AgentCore. Es un agente de Strands puro: modelo, instrucciones, una
-herramienta, y un loop de chat en la terminal.
+herramienta, la función invocar y un loop de chat en la terminal.
 
 El punto de este archivo es enseñar el agente "antes": funciona, pero solo aquí.
 Si cierras la terminal, deja de existir. La versión con AgentCore (agente.py)
-toma exactamente este mismo agente y lo lleva a producción.
+toma exactamente este mismo agente y la misma función invocar, y les agrega
+cuatro líneas para llevarlo a producción. Compáralos lado a lado.
 
 Correr:
     python agente_local.py
@@ -50,6 +51,16 @@ def consultar_cuenta(usuario_id: str) -> str:
 agente = Agent(system_prompt=SYSTEM_PROMPT, tools=[consultar_cuenta])
 
 
+def invocar(payload, context=None):
+    """Puerta de entrada del agente. Recibe {"prompt": ...} y devuelve un dict."""
+    mensaje = payload.get("prompt", "")
+    if not isinstance(mensaje, str) or not mensaje.strip():
+        return {"error": "El campo 'prompt' debe ser un texto no vacío"}
+
+    resultado = agente(mensaje)
+    return {"result": resultado.message}
+
+
 if __name__ == "__main__":
     print("Ritmo (local). Escribe 'salir' para terminar.\n")
     while True:
@@ -57,5 +68,5 @@ if __name__ == "__main__":
         if pregunta.lower() == "salir":
             break
         print("\nRitmo: ", end="")
-        agente(pregunta)
+        invocar({"prompt": pregunta})
         print()
