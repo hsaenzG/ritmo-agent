@@ -1,0 +1,26 @@
+# Entorno virtual
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Credenciales y secretos (NUNCA subir)
+.env
+*.pem
+*.key
+credentials
+aws-credentials.json
+
+# Artefactos del deploy de AgentCore / toolkit
+.bedrock_agentcore/
+Dockerfile
+.dockerignore
+*.log
+
+# Sistema
+.DS_Store

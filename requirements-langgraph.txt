@@ -1,0 +1,6 @@
+# Dependencias para la variante de LangGraph (agente_langgraph.py, Parte 6).
+# Se usa solo para el callout de cierre "el mismo deploy con otro framework".
+bedrock-agentcore
+langchain
+langgraph
+langchain-aws
