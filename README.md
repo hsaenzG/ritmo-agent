@@ -16,6 +16,12 @@ Por qué:
 - El agente corre aislado en un entorno gestionado. Darle credenciales de base rompe ese aislamiento.
 - La herramienta es el contrato, no la base. Por eso el mismo agente sirve para Strands o LangGraph sin cambios, y por eso escala a AgentCore Gateway cuando el acceso a datos crece.
 
+## Arquitectura
+
+![Diagrama de arquitectura de Ritmo](docs/arquitectura.svg)
+
+El usuario habla con el agente (Strands o LangGraph) que corre en AgentCore Runtime. El agente razona con un modelo de Amazon Bedrock y, cuando necesita datos de la cuenta, llama a la herramienta `consultar_cuenta`. Esa herramienta es el único camino hacia `servicio_datos.py`, que a su vez es la única capa que toca los datos. El acceso directo del agente a la base está bloqueado por diseño.
+
 ## Estructura
 
 | Archivo | Rol |
