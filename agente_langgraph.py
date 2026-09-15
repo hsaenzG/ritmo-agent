@@ -17,7 +17,7 @@ Correr como servicio de AgentCore:
     python agente_langgraph.py
 Desplegar:
     agentcore configure --entrypoint agente_langgraph.py
-    agentcore launch
+    agentcore deploy
     agentcore invoke '{"prompt": "¿Qué plan tengo?"}'
 
 Dependencias en requirements-langgraph.txt.
@@ -35,7 +35,9 @@ from bedrock_agentcore.runtime import BedrockAgentCoreApp
 SYSTEM_PROMPT = """Eres Ritmo, el asistente de una plataforma de streaming de música.
 Tono: cercano, directo, usa 'tú'. Responde en español. Máximo 3 frases.
 Ayudas al usuario con dudas de su cuenta: su plan, su actividad, recomendaciones.
-Nunca inventes datos de la cuenta. Si no tienes el dato, dilo y ofrece verificar."""
+Nunca inventes datos de la cuenta. Si no tienes el dato, dilo y ofrece verificar.
+Responde solo con el mensaje final para el usuario. No muestres tu razonamiento
+ni uses etiquetas como <thinking>."""
 
 
 # La MISMA herramienta que en agente.py, con el mismo contrato. Recibe un
@@ -56,9 +58,9 @@ def consultar_cuenta(usuario_id: str) -> str:
     )
 
 
-# El modelo, sobre Bedrock, igual que el agente de Strands.
+# El modelo, sobre Bedrock, igual que el agente de Strands: Nova Lite.
 llm = init_chat_model(
-    "us.anthropic.claude-3-5-haiku-20241022-v1:0",
+    "us.amazon.nova-lite-v1:0",
     model_provider="bedrock_converse",
 )
 

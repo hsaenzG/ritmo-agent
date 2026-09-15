@@ -24,7 +24,7 @@ Invocarlo mientras corre:
 
 Es también lo que corre cuando se despliega:
     agentcore configure --entrypoint agente.py
-    agentcore launch
+    agentcore deploy
     agentcore invoke '{"prompt": "¿Qué plan tengo?"}'
 """
 
@@ -36,10 +36,15 @@ from servicio_datos import obtener_cuenta
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
 
 
+# Modelo sobre Amazon Bedrock. Nova Lite: rápido, barato y disponible en la región.
+MODELO = "us.amazon.nova-lite-v1:0"
+
 SYSTEM_PROMPT = """Eres Ritmo, el asistente de una plataforma de streaming de música.
 Tono: cercano, directo, usa 'tú'. Responde en español. Máximo 3 frases.
 Ayudas al usuario con dudas de su cuenta: su plan, su actividad, recomendaciones.
-Nunca inventes datos de la cuenta. Si no tienes el dato, dilo y ofrece verificar."""
+Nunca inventes datos de la cuenta. Si no tienes el dato, dilo y ofrece verificar.
+Responde solo con el mensaje final para el usuario. No muestres tu razonamiento
+ni uses etiquetas como <thinking>."""
 
 
 @tool
@@ -59,9 +64,15 @@ def consultar_cuenta(usuario_id: str) -> str:
     )
 
 
-agente = Agent(system_prompt=SYSTEM_PROMPT, tools=[consultar_cuenta])
+agente = Agent(model=MODELO, system_prompt=SYSTEM_PROMPT, tools=[consultar_cuenta])
 
 
+# --- Línea 2 de AgentCore: inicializar ----------------------------------------
+app = BedrockAgentCoreApp()
+
+
+# --- Línea 3 de AgentCore: marcar la puerta de entrada ------------------------
+@app.entrypoint
 def invocar(payload, context=None):
     """Puerta de entrada del agente. Recibe {"prompt": ...} y devuelve un dict."""
     mensaje = payload.get("prompt", "")
@@ -71,12 +82,6 @@ def invocar(payload, context=None):
     resultado = agente(mensaje)
     return {"result": resultado.message}
 
-
-# --- Línea 2 de AgentCore: inicializar ----------------------------------------
-app = BedrockAgentCoreApp()
-
-# --- Línea 3 de AgentCore: marcar invocar como la puerta de entrada -----------
-app.entrypoint(invocar)
 
 # --- Línea 4 de AgentCore: correr ---------------------------------------------
 if __name__ == "__main__":

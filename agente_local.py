@@ -25,10 +25,15 @@ from strands import Agent, tool
 from servicio_datos import obtener_cuenta
 
 
+# Modelo sobre Amazon Bedrock. Nova Lite: rápido, barato y disponible en la región.
+MODELO = "us.amazon.nova-lite-v1:0"
+
 SYSTEM_PROMPT = """Eres Ritmo, el asistente de una plataforma de streaming de música.
 Tono: cercano, directo, usa 'tú'. Responde en español. Máximo 3 frases.
 Ayudas al usuario con dudas de su cuenta: su plan, su actividad, recomendaciones.
-Nunca inventes datos de la cuenta. Si no tienes el dato, dilo y ofrece verificar."""
+Nunca inventes datos de la cuenta. Si no tienes el dato, dilo y ofrece verificar.
+Responde solo con el mensaje final para el usuario. No muestres tu razonamiento
+ni uses etiquetas como <thinking>."""
 
 
 @tool
@@ -48,7 +53,7 @@ def consultar_cuenta(usuario_id: str) -> str:
     )
 
 
-agente = Agent(system_prompt=SYSTEM_PROMPT, tools=[consultar_cuenta])
+agente = Agent(model=MODELO, system_prompt=SYSTEM_PROMPT, tools=[consultar_cuenta])
 
 
 def invocar(payload, context=None):
